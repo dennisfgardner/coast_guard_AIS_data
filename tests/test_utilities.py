@@ -14,6 +14,8 @@ class TestUtilities(unittest.TestCase):
     def test_list_files_by_type(self):
         data_dir = self.config.data_dir
         file_names = list_files_by_type(data_dir, ".csv")
+        ext = file_names[0].split(".")[-1]
+        self.assertEqual(ext, "csv")
         self.assertEqual(len(file_names), 3)
         self.assertIn("AIS_test_00.csv", file_names)
         self.assertIn("AIS_test_01.csv", file_names)
