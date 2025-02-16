@@ -80,6 +80,27 @@ class TestUtilities(unittest.TestCase):
         with self.assertRaises(AssertionError):
             ut.is_cog_valid(-1)
 
+    def test_is_lat_lon_valid(self):
+        self.assertTrue(ut.is_lat_lon_valid(40.0150, -105.2705))
+        self.assertTrue(ut.is_lat_lon_valid(38.9072, -77.0369))
+        self.assertTrue(ut.is_lat_lon_valid(36.9741, -122.0308))
+        self.assertFalse(ut.is_lat_lon_valid(90.1, 180.0))
+        self.assertFalse(ut.is_lat_lon_valid(-90.1, -180.0))
+        self.assertFalse(ut.is_lat_lon_valid(90.0, 180.1))
+        self.assertFalse(ut.is_lat_lon_valid(-90.0, -180.1))
+        self.assertFalse(ut.is_lat_lon_valid(50.1, 45.0))
+        self.assertFalse(ut.is_lat_lon_valid(22.0, 45.0))
+        self.assertFalse(ut.is_lat_lon_valid(35.0, -131.0))
+        self.assertFalse(ut.is_lat_lon_valid(35.0, -64.0))
+        with self.assertRaises(AssertionError):
+            ut.is_lat_lon_valid("string", 0.0)
+        with self.assertRaises(AssertionError):
+            ut.is_lat_lon_valid(0.0, "string")
+        with self.assertRaises(AssertionError):
+            ut.is_lat_lon_valid(0, 0.0)
+        with self.assertRaises(AssertionError):
+            ut.is_lat_lon_valid(0.0, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

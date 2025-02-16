@@ -88,3 +88,24 @@ def is_cog_valid(input_cog: float) -> bool:
     if 0.0 <= input_cog < 360.0:
         return True
     return False
+
+
+def is_lat_lon_valid(lat: float, lon: float) -> bool:
+    """
+    Returns True if input has valid latitude and longitude values, else False.
+
+    A loose bouding box around the continetal US is used to validate values.
+    The tropic of cancer is used as the bottom latitude.
+
+    Args:
+        lat: latitude value to check
+        lon: longitude value to check
+
+    Returns:
+        boolean
+    """
+    assert isinstance(lat, float), "Latitude must be a float"
+    assert isinstance(lon, float), "Longitude must be a float"
+    if 23.4694 <= lat <= 50.0 and -130.0 <= lon <= -65.0:
+        return True
+    return False
