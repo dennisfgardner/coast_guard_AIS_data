@@ -5,3 +5,4 @@ from dataclasses import dataclass
 @dataclass()
 class Config:
     data_dir: Path = Path("./data")
+    output_dir: Path = Path("./output")
