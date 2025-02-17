@@ -4,6 +4,16 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
+class TrackParameters():
+    """define parameters for track processing
+
+    """
+    min_duration_hrs: float = 1.0
+    min_dist_nmi: float = 5.0
+    min_points: int = 10
+
+
+@dataclass(frozen=True)
 class RegionOfInterest():
     """define ROI in lat & long degrees
 
@@ -33,3 +43,5 @@ class Config:
 
 if __name__ == "__main__":
     pprint(Config())
+    pprint(RegionOfInterest())
+    pprint(TrackParameters())
