@@ -101,6 +101,21 @@ class TestUtilities(unittest.TestCase):
         with self.assertRaises(AssertionError):
             ut.is_lat_lon_valid(0.0, 0)
 
+    def test_is_in_roi(self):
+        self.assertTrue(ut.is_in_roi(self.config.roi, 38.9072, -77.0369))
+        self.assertFalse(ut.is_in_roi(self.config.roi, 38.0, -78.0))
+        self.assertFalse(ut.is_in_roi(self.config.roi, 38.0, -73.0))
+        self.assertFalse(ut.is_in_roi(self.config.roi, 36.0, -75.0))
+        self.assertFalse(ut.is_in_roi(self.config.roi, 40.0, -75.0))
+        with self.assertRaises(AssertionError):
+            ut.is_in_roi(self.config.roi, "string", -76.0)
+        with self.assertRaises(AssertionError):
+            ut.is_in_roi(self.config.roi, 38.0, "string")
+        with self.assertRaises(AssertionError):
+            ut.is_in_roi(self.config.roi, 38, -73.0)
+        with self.assertRaises(AssertionError):
+            ut.is_in_roi(self.config.roi, 38.0, -75)
+
 
 if __name__ == '__main__':
     unittest.main()

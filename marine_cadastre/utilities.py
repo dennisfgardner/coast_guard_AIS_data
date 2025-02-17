@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from .config import RegionOfInterest
+
 "a collection of utility functions"
 
 
@@ -19,9 +21,9 @@ def list_files_by_type(data_dir: Path, filetype: str) -> list:
 
 def is_mmsi_vessel(input_mmsi: int) -> bool:
     """
-    Returns True if input is vessle MMSI, else False.
+    Returns True if input is vessel MMSI, else False.
 
-    The first digit of the catagorizes the emitter idetity: 2 - 7 are for
+    The first digit of the categorizes the emitter identity: 2 - 7 are for
     individual vessels.
     https://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity
 
@@ -60,7 +62,7 @@ def apply_cog_correction(input_cog: float) -> float:
     Add 406.9 to negative COG values per Marine Cadastre FAQ on COG values.
 
 
-    Qutote from FAQ: "For data beginning in 2015, COG values that are less than
+    Quote from FAQ: "For data beginning in 2015, COG values that are less than
     0 (negative) are known to be incorrect and can be corrected by adding 409.6
     """
     assert isinstance(input_cog, float), "COG must be a float"
@@ -75,7 +77,7 @@ def is_cog_valid(input_cog: float) -> bool:
 
     COG must be greater than or equal to zero and less than 360 degs per FAQ.
 
-    Qutote from FAQ: "Values of 360.0 refer to the COG being unavailable and
+    Quote from FAQ: "Values of 360.0 refer to the COG being unavailable and
     can be ignored."
 
     Args:
@@ -94,7 +96,7 @@ def is_lat_lon_valid(lat: float, lon: float) -> bool:
     """
     Returns True if input has valid latitude and longitude values, else False.
 
-    A loose bouding box around the continetal US is used to validate values.
+    A loose bounding box around the continental US is used to validate values.
     The tropic of cancer is used as the bottom latitude.
 
     Args:
@@ -107,5 +109,24 @@ def is_lat_lon_valid(lat: float, lon: float) -> bool:
     assert isinstance(lat, float), "Latitude must be a float"
     assert isinstance(lon, float), "Longitude must be a float"
     if 23.4694 <= lat <= 50.0 and -130.0 <= lon <= -65.0:
+        return True
+    return False
+
+
+def is_in_roi(roi: RegionOfInterest, lat: float, lon: float) -> bool:
+    """
+    Returns True if lat and lon inside ROI, else False.
+
+    Args:
+        roi: RegionOfInterest
+        lat: latitude value to check
+        lon: longitude value to check
+
+    Returns:
+        boolean
+    """
+    assert isinstance(lat, float), "Latitude must be a float"
+    assert isinstance(lon, float), "Longitude must be a float"
+    if roi.lat_min <= lat <= roi.lat_max and roi.lon_min <= lon <= roi.lon_max:
         return True
     return False

@@ -5,13 +5,13 @@ from typing import List
 from pathlib import Path
 from pprint import pprint
 
-
-from marine_cadastre.config import Config
 import marine_cadastre.utilities as ut
+from marine_cadastre.config import Config, RegionOfInterest
 
 
-def filter_data(csv_files: List[Path], output_dir: Path):
-    """Read csv file, remove bad rows, write new file with only vaild data.
+def filter_invalid_data(csv_files: List[Path], output_dir: Path):
+    """
+    Read csv file, remove bad rows, write new file with only valid data.
 
     Args:
         files: marine cadastre csv files, full path to file
@@ -57,6 +57,45 @@ def filter_data(csv_files: List[Path], output_dir: Path):
         print(f"\t\t{good_rows/ii*100.0:.2f}% valid")
 
 
+def roi_filter(roi: RegionOfInterest, csv_files: List[Path], output_dir: Path):
+    """
+    Filter based on region of interest.
+
+    Args:
+        roi: region of interest
+        csv_files: filtered csv files, full path to file
+        output_dir: directory to write output
+
+    Returns:
+        None, write csv to output dir
+    """
+    for file in csv_files:
+        print(f"Processing {file}...")
+
+        with open(file, "r") as input_csv:
+            with open(f"{output_dir}/{file.name}", "w") as output_csv:
+
+                reader = csv.reader(input_csv)
+                writer = csv.writer(output_csv)
+
+                header = next(reader)
+                writer.writerow(header)
+
+                in_roi_rows = 0
+                for ii, row in enumerate(reader):
+                    lat = float(row[2])
+                    lon = float(row[3])
+                    if not ut.is_in_roi(roi, lat, lon):
+                        continue
+                    in_roi_rows += 1
+                    writer.writerow(row)
+
+        print(f"\tFinished processing {file}")
+        print(f"\t\t{ii:,} lines read")
+        print(f"\t\t{in_roi_rows:,} in bound rows")
+        print(f"\t\t{in_roi_rows/ii*100.0:.2f}% in bounds")
+
+
 def main():
     print("Running Marine Cadastre Main Function")
 
@@ -72,11 +111,17 @@ def main():
         pprint(filenames)
         print(f"Found {len(filenames)} CSV files in {config.data_dir}")
 
-    # filter data, i.e. remove invalid rows
+    # filter invalid data
     filtered_data_dir = config.output_dir / "filtered"
-    filtered_data_dir.mkdir(parents=True, exist_ok=True)
-    full_file_paths = [config.data_dir/f for f in filenames]
-    filter_data(full_file_paths, filtered_data_dir)
+    # filtered_data_dir.mkdir(parents=True, exist_ok=True)
+    # raw_data_filepaths = [config.data_dir/f for f in filenames]
+    # filter_invalid_data(raw_data_filepaths, filtered_data_dir)
+
+    # filter based on roi
+    roi_data_dir = config.output_dir / "roi"
+    roi_data_dir.mkdir(parents=True, exist_ok=True)
+    filtered_data_filepaths = [filtered_data_dir/f for f in filenames]
+    roi_filter(config.roi, filtered_data_filepaths, roi_data_dir)
 
 
 if __name__ == "__main__":
