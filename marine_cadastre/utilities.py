@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import numpy as np
+
 from .config import RegionOfInterest
 
 "a collection of utility functions"
@@ -130,3 +132,33 @@ def is_in_roi(roi: RegionOfInterest, lat: float, lon: float) -> bool:
     if roi.lat_min <= lat <= roi.lat_max and roi.lon_min <= lon <= roi.lon_max:
         return True
     return False
+
+
+def haversine_distance(phi1: float, lambda1: float,
+                       phi2: float, lambda2: float) -> float:
+    """
+    Calculate the great circle distance between two points.
+
+    Args:
+        phi1: first point latitude
+        lambda1: first point longitude
+        phi2: second point latitude
+        lambda2: second point longitude
+
+    Returns:
+        distance in nautical miles
+
+    Reference:
+        https://en.wikipedia.org/wiki/Haversine_formula
+    """
+    # Convert decimal degrees to radians
+    phi1, lambda1, phi2, lambda2 = \
+        map(np.radians, [phi1, lambda1, phi2, lambda2])
+
+    # Haversine formula
+    dphi = phi2 - phi1
+    dlambda = lambda2 - lambda1
+    terms = 1 - np.cos(dphi) + np.cos(phi1) * np.cos(phi2) * (1 - np.cos(dlambda))
+    radius_mi = 3959.0
+    radius_nmi = radius_mi*0.868976
+    return 2*radius_nmi*np.arcsin(np.sqrt(terms/2))

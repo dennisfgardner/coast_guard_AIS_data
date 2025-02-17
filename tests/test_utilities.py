@@ -81,8 +81,11 @@ class TestUtilities(unittest.TestCase):
             ut.is_cog_valid(-1)
 
     def test_is_lat_lon_valid(self):
+        # Boulder, CO
         self.assertTrue(ut.is_lat_lon_valid(40.0150, -105.2705))
+        # Washington, D.C.
         self.assertTrue(ut.is_lat_lon_valid(38.9072, -77.0369))
+        # Santa Cruz, CA
         self.assertTrue(ut.is_lat_lon_valid(36.9741, -122.0308))
         self.assertFalse(ut.is_lat_lon_valid(90.1, 180.0))
         self.assertFalse(ut.is_lat_lon_valid(-90.1, -180.0))
@@ -102,6 +105,7 @@ class TestUtilities(unittest.TestCase):
             ut.is_lat_lon_valid(0.0, 0)
 
     def test_is_in_roi(self):
+        # Washington, D.C.
         self.assertTrue(ut.is_in_roi(self.config.roi, 38.9072, -77.0369))
         self.assertFalse(ut.is_in_roi(self.config.roi, 38.0, -78.0))
         self.assertFalse(ut.is_in_roi(self.config.roi, 38.0, -73.0))
@@ -115,6 +119,20 @@ class TestUtilities(unittest.TestCase):
             ut.is_in_roi(self.config.roi, 38, -73.0)
         with self.assertRaises(AssertionError):
             ut.is_in_roi(self.config.roi, 38.0, -75)
+
+    def test_haversine_distance(self):
+        # Washington, D.C. to Boulder, CO
+        self.assertAlmostEqual(
+            ut.haversine_distance(
+                38.9072, -77.0369, 40.0150, -105.2705), 1305.0, places=0)
+        # Washington, D.C. to Santa Cruz, CA
+        self.assertAlmostEqual(
+            ut.haversine_distance(
+                38.9072, -77.0369, 36.9741, -122.0308), 2112.0, places=0)
+        # Boulder, CO to Santa Cruz, CA
+        self.assertAlmostEqual(
+            ut.haversine_distance(
+                40.0150, -105.2705, 36.9741, -122.0308), 807.2, places=2)
 
 
 if __name__ == '__main__':
