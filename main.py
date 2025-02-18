@@ -10,6 +10,8 @@ import numpy as np
 import marine_cadastre.utilities as ut
 import marine_cadastre.config as cfg
 import marine_cadastre.ais_broadcast_pts_to_tracks as pts2trks
+import marine_cadastre.plotting as mc_plt
+import marine_cadastre.track_data_handler as tdh
 
 
 def filter_invalid_data(csv_files: List[Path], output_dir: Path):
@@ -127,25 +129,35 @@ def main():
     # roi_filter(config.roi, filtered_data_filepaths, roi_data_dir)
 
     csv_file = Path("./output/roi/AIS_2023_01_01.csv")
-    tk_cfg = cfg.TrackParameters()
+    # tk_cfg = cfg.TrackParameters()
 
-    tracks = pts2trks.broadcast_pts_to_tracks(csv_file)
+    # tracks = pts2trks.broadcast_pts_to_tracks(csv_file)
 
-    track_stats = pts2trks.calculate_track_stats(tracks)
-    # filter tracks based on stats, TODO can be combined into one step
-    track_stats = track_stats[
-        (track_stats["total_distance"] > tk_cfg.min_dist_nmi) &
-        (track_stats["duration_hours"] > tk_cfg.min_duration_hrs) &
-        (track_stats["number_of_positions"] > tk_cfg.min_points)]
+    # track_stats = pts2trks.calculate_track_stats(tracks)
+    # # filter tracks based on stats, TODO can be combined into one step
+    # track_stats = track_stats[
+    #     (track_stats["total_distance"] > tk_cfg.min_dist_nmi) &
+    #     (track_stats["duration_hours"] > tk_cfg.min_duration_hrs) &
+    #     (track_stats["number_of_positions"] > tk_cfg.min_points)]
 
-    print("Track Summary:")
-    print(track_stats.to_string())
+    # print("Track Summary:")
+    # print(track_stats.to_string())
 
-    resampled_tracks: Dict[int, np.ndarray] = {}
-    for _, row in track_stats.iterrows():
-        mmsi = int(row['mmsi'])
-        resampled_tracks[mmsi] = pts2trks.resample(tracks[mmsi], interval=600)
-    print(resampled_tracks)
+    # resampled_tracks: Dict[int, np.ndarray] = {}
+    # for _, row in track_stats.iterrows():
+    #     mmsi = int(row['mmsi'])
+    #     resampled_tracks[mmsi] = pts2trks.resample(tracks[mmsi], interval=600)
+    # print(resampled_tracks)
+    # TODO format data in TrAISformer normalized format
+    # TODO normalized lat, lon, sog, cog
+    # TODO add mmsi and timestamp values to np.array
+
+
+    mc_plt.get_basemap(Path("./output"), config.roi)
+    track_datapath = Path("./data/ct_dma_train.pkl")
+    tdh.load_norm_track_data(track_datapath, config.roi)
+    
+
 
 
 if __name__ == "__main__":
