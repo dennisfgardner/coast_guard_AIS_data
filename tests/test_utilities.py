@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from marine_cadastre.config import Config
 import marine_cadastre.utilities as ut
 
@@ -133,6 +135,27 @@ class TestUtilities(unittest.TestCase):
         self.assertAlmostEqual(
             ut.haversine_distance(
                 40.0150, -105.2705, 36.9741, -122.0308), 807.2, places=2)
+
+    def test_undo_norm_ll(self):
+        # Washington, D.C.
+        orig_lat = 38.9072
+        orig_lon = -77.0369
+        norm_lat = (orig_lat - self.config.roi.lat_min) / self.config.roi.lat_width
+        norm_lon = (orig_lon - self.config.roi.lon_min) / self.config.roi.lon_width
+        self.assertEqual(
+            ut.undo_norm_ll(self.config.roi, norm_lat, norm_lon),
+            (orig_lat, orig_lon)
+        )
+        norm_lats = np.array([0.0, 0.5, 1.0,])
+        norm_lons = np.array([0.0, 0.5, 1.0])
+        true_lats = np.array([self.config.roi.lat_min, self.config.roi.lat_cen,
+                              self.config.roi.lat_max])
+        true_lons = np.array([self.config.roi.lon_min, self.config.roi.lon_cen,
+                              self.config.roi.lon_max])
+        (ret_lats, ret_lons) = ut.undo_norm_ll(self.config.roi, norm_lats,
+                                               norm_lons)
+        self.assertTrue(np.all(np.isclose(true_lats, ret_lats)))
+        self.assertTrue(np.all(np.isclose(true_lons, ret_lons)))
 
 
 if __name__ == '__main__':

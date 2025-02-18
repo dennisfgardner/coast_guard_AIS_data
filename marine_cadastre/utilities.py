@@ -162,3 +162,21 @@ def haversine_distance(phi1: float, lambda1: float,
     radius_mi = 3959.0
     radius_nmi = radius_mi*0.868976
     return 2*radius_nmi*np.arcsin(np.sqrt(terms/2))
+
+
+def undo_norm_ll(roi: RegionOfInterest, norm_lats: np.ndarray,
+                 norm_lons: np.ndarray):
+    """
+    Undo normalization of latitude and longitude values.
+
+    Args:
+        roi: RegionOfInterest
+        norm_lats: normalized latitude values
+        norm_lons: normalized longitude values
+    Returns:
+        unnorm_lats: unnormalized latitude values
+        unnorm_lons: unnormalized longitude values
+    """
+    unnorm_lats = norm_lats * (roi.lat_width) + roi.lat_min
+    unnorm_lons = norm_lons * (roi.lon_width) + roi.lon_min
+    return unnorm_lats, unnorm_lons

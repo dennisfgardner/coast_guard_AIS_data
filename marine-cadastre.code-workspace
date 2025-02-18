@@ -6,13 +6,25 @@
 	],
 	"settings": {
 		"cSpell.words": [
+			"arcsin",
+			"basemap",
 			"Cadastre",
+			"Carto",
+			"contextily",
+			"datapath",
 			"degs",
 			"dlambda",
+			"dlat",
+			"dlon",
 			"Downsample",
 			"dphi",
+			"interp",
 			"iterrows",
-			"mmsi"
+			"lons",
+			"mmsi",
+			"ndarray",
+			"sogs",
+			"unnorm"
 		]
 	}
 }
