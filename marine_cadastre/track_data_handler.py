@@ -22,3 +22,4 @@ def load_norm_track_data(datapath: Path, roi: RegionOfInterest) -> List[Dict]:
     with open(datapath, "rb") as f:
         data = pickle.load(f)
     print(f"Loaded {len(data)} tracks")
+    # TODO unnormalize LAT LON SOG and COG
