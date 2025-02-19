@@ -6,6 +6,8 @@ from pathlib import Path
 from pprint import pprint
 
 import numpy as np
+import matplotlib.pyplot as plt
+import contextily as ctx
 
 import marine_cadastre.utilities as ut
 import marine_cadastre.config as cfg
@@ -153,10 +155,21 @@ def main():
     # TODO add mmsi and timestamp values to np.array
 
 
-    mc_plt.get_basemap(Path("./output"), config.roi)
+    basemap_path = mc_plt.get_basemap(Path("./output"), config.roi)
     track_datapath = Path("./data/ct_dma_train.pkl")
-    tdh.load_norm_track_data(track_datapath, config.roi)
+    data = tdh.load_pkld_track_data(track_datapath, config.roi)
     
+    plt.style.use("fivethirtyeight")
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.scatter(data[0]["traj"][:, 1], data[0]["traj"][:, 0], s=10, c="blue", alpha=0.5)
+    ax.scatter(data[1]["traj"][:, 1], data[1]["traj"][:, 0], s=10, c="red", alpha=0.5)
+    ax.scatter(data[2]["traj"][:, 1], data[2]["traj"][:, 0], s=10, c="green", alpha=0.5)
+    ax.scatter(data[3]["traj"][:, 1], data[3]["traj"][:, 0], s=10, c="black", alpha=0.5)
+    ax.scatter(data[4]["traj"][:, 1], data[4]["traj"][:, 0], s=10, c="orange", alpha=0.5)
+    ax.scatter(data[5]["traj"][:, 1], data[5]["traj"][:, 0], s=10, c="purple", alpha=0.5)
+    ctx.add_basemap(ax, source=basemap_path, crs="epsg:4326")
+    plt.show()
+
 
 
 
