@@ -18,14 +18,21 @@
 			"dlon",
 			"Downsample",
 			"dphi",
+			"figsize",
+			"fivethirtyeight",
 			"interp",
 			"iterrows",
 			"lons",
 			"mmsi",
 			"ndarray",
+			"pkld",
+			"rois",
 			"sogs",
+			"traisformer",
 			"traj",
-			"unnorm"
+			"trks",
+			"unnorm",
+			"upzips"
 		]
 	}
 }

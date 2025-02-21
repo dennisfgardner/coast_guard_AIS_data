@@ -6,10 +6,10 @@ from pathlib import Path
 from pprint import pprint
 
 import marine_cadastre.utilities as ut
-import marine_cadastre.config as cfg
+from marine_cadastre.config import Config, RegionOfInterest
 
 
-def roi_selector(roi: cfg.RegionOfInterest, csv_files: List[Path], output_dir: Path):
+def roi_selector(roi: RegionOfInterest, csv_files: List[Path], output_dir: Path):
     """
     Select based on region of interest.
 
@@ -55,8 +55,8 @@ def run_roi_selector():
     print("Running Marine Cadastre ROI Selector Function")
 
     # get filenames
-    # TODO use command line args for directory path
-    filtered_data = Path("/mnt/data/filtered")  # update for your system
+    config = Config()
+    filtered_data = config.filtered_data_dir
     filenames = ut.list_files_by_type(filtered_data, ".csv")
     if len(filenames) == 0:
         print(f"No CSV files found in {filtered_data}")
@@ -66,10 +66,10 @@ def run_roi_selector():
         print(f"Found {len(filenames)} CSV files in {filtered_data}")
 
     # select based on roi
-    roi_data_dir = Path("/mnt/data/roi")  # update for your system
+    roi_data_dir = config.rois_data_dir
     roi_data_dir.mkdir(parents=True, exist_ok=True)
     filtered_data_filepaths = [filtered_data/f for f in filenames]
-    roi = cfg.RegionOfInterest()
+    roi = config.roi
     roi_selector(roi, filtered_data_filepaths, roi_data_dir)
 
 

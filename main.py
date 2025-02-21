@@ -1,8 +1,6 @@
 "main entry point"
 
-import csv
 import pickle
-from typing import List, Dict
 from pathlib import Path
 from pprint import pprint
 
@@ -11,7 +9,7 @@ import matplotlib.pyplot as plt
 import contextily as ctx
 
 import marine_cadastre.utilities as ut
-import marine_cadastre.config as cfg
+from marine_cadastre.config import Config
 import marine_cadastre.ais_broadcast_pts_to_tracks as pts2trks
 import marine_cadastre.plotting as mc_plt
 import marine_cadastre.track_data_handler as tdh
@@ -20,58 +18,59 @@ import marine_cadastre.track_data_handler as tdh
 def main():
     print("Running Marine Cadastre Main Function")
 
-    config = cfg.Config()
+    config = Config()
     pprint(config)
 
     # get filenames
-    filenames = ut.list_files_by_type(config.data_dir, ".csv")
+    filenames = ut.list_files_by_type(config.rois_data_dir, ".csv")
     if len(filenames) == 0:
-        print(f"No CSV files found in {config.data_dir}")
+        print(f"No CSV files found in {config.rois_data_dir}")
         return
     else:
         pprint(filenames)
-        print(f"Found {len(filenames)} CSV files in {config.data_dir}")
+        print(f"Found {len(filenames)} CSV files in {config.rois_data_dir}")
 
+    csv_file = config.rois_data_dir/filenames[0]  # for debug only
+    print(csv_file)
 
-    # csv_file = Path("./output/roi/AIS_2023_01_01.csv")
-    # tk_cfg = cfg.TrackParameters()
+    tracks = pts2trks.broadcast_pts_to_tracks(csv_file)
 
-    # tracks = pts2trks.broadcast_pts_to_tracks(csv_file)
+    track_stats = pts2trks.calculate_track_stats(tracks)
+    # filter tracks based on stats
+    track_stats = track_stats[
+        (track_stats["total_distance"] > config.track_params.min_dist_nmi) &
+        (track_stats["duration_hours"] > config.track_params.min_duration_hrs) &
+        (track_stats["number_of_positions"] > config.track_params.min_points)]
 
-    # track_stats = pts2trks.calculate_track_stats(tracks)
-    # # filter tracks based on stats, TODO can be combined into one step
-    # track_stats = track_stats[
-    #     (track_stats["total_distance"] > tk_cfg.min_dist_nmi) &
-    #     (track_stats["duration_hours"] > tk_cfg.min_duration_hrs) &
-    #     (track_stats["number_of_positions"] > tk_cfg.min_points)]
+    print("Track Summary:")
+    print(track_stats.to_string())
 
-    # print("Track Summary:")
-    # print(track_stats.to_string())
+    traisformer = []
+    for _, row in track_stats.iterrows():
+        mmsi = int(row['mmsi'])
+        timestamps, lats, lons, sogs, cogs = pts2trks.resample(tracks[mmsi],
+                                                               interval=600)
+        # trajectory data in the format used in TrAISformer publication
+        entry = {}
+        entry[mmsi] = mmsi
+        traj = np.zeros((timestamps.shape[0], 6), dtype=np.float32)
+        traj[:, 0] = (lats - config.roi.lat_min)/(config.roi.lat_width)
+        traj[:, 1] = (lons - config.roi.lon_min)/(config.roi.lon_width)
+        traj[:, 2] = sogs/40.0
+        traj[:, 3] = cogs/360.0
+        traj[:, 4] = timestamps
+        traj[:, 5] = mmsi
+        entry["traj"] = traj
+        traisformer.append(entry)
 
-    # traisfromer_data = []
-    # for _, row in track_stats.iterrows():
-    #     mmsi = int(row['mmsi'])
-    #     timestamps, lats, lons, sogs, cogs = pts2trks.resample(tracks[mmsi],
-    #                                                            interval=600)
-    #     # trajectory data in the format used in TrAISformer publication
-    #     entry = {}
-    #     entry[mmsi] = mmsi
-    #     traj = np.zeros((timestamps.shape[0], 6), dtype=np.float32)
-    #     traj[:, 0] = (lats - config.roi.lat_min)/(config.roi.lat_width)
-    #     traj[:, 1] = (lons - config.roi.lon_min)/(config.roi.lon_width)
-    #     traj[:, 2] = sogs/40.0
-    #     traj[:, 3] = cogs/360.0
-    #     traj[:, 4] = timestamps
-    #     traj[:, 5] = mmsi
-    #     entry["traj"] = traj
-    #     traisfromer_data.append(entry)
-    # with open(config.output_dir / "traisformer_data.pkl", "wb") as f:
-    #     pickle.dump(traisfromer_data, f)
+    track_data_dir = config.track_data_dir
+    track_data_dir.mkdir(parents=True, exist_ok=True)
+    with open(config.track_data_dir / "traisformer_data.pkl", "wb") as f:
+        pickle.dump(traisformer, f)
 
-
-    basemap_path = mc_plt.get_basemap(Path("./output"), config.roi)
+    basemap_path = mc_plt.get_basemap(config.results_dir, config.roi)
     # track_datapath = Path("./data/ct_dma_train.pkl")
-    track_datapath = Path(config.output_dir / "traisformer_data.pkl")
+    track_datapath = Path(config.track_data_dir / "traisformer_data.pkl")
     data = tdh.load_pkld_track_data(track_datapath, config.roi)
 
     plt.style.use("fivethirtyeight")
@@ -79,9 +78,7 @@ def main():
     for entry in data:
         ax.scatter(entry["traj"][:, 1], entry["traj"][:, 0], s=10, alpha=0.5)
     ctx.add_basemap(ax, source=basemap_path, crs="epsg:4326")
-    plt.show()
-
-
+    fig.savefig(config.results_dir/"track_plot.png")
 
 
 if __name__ == "__main__":

@@ -58,8 +58,12 @@ class RegionOfInterest():
 
 @dataclass()
 class Config:
-    data_dir: Path = Path("./data")
-    output_dir: Path = Path("./output")
+    zips_data_dir: Path = Path("/mnt/data/zips")
+    upzips_data_dir: Path = Path("/mnt/data/unzips")
+    filtered_data_dir: Path = Path("/mnt/data/filtered")
+    rois_data_dir: Path = Path("/mnt/data/rois")
+    track_data_dir: Path = Path("/mnt/data/tracks")
+    results_dir: Path = Path("./output")
     roi: RegionOfInterest = RegionOfInterest()
     track_params: TrackParameters = TrackParameters()
 

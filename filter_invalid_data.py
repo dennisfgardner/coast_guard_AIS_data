@@ -6,10 +6,10 @@ from pathlib import Path
 from pprint import pprint
 
 import marine_cadastre.utilities as ut
-from marine_cadastre.config import TrackParameters
+from marine_cadastre.config import Config, TrackParameters
 
 
-def filter_invalid_data(csv_files: List[Path], output_dir: Path):
+def filter_invalid_data(csv_files: List[Path], output_dir: Path, trk_params: TrackParameters):
     """
     Read csv file, remove bad rows, write new file with only valid data.
 
@@ -47,7 +47,7 @@ def filter_invalid_data(csv_files: List[Path], output_dir: Path):
                     # ensure sog is valid
                     # max speed over ground in knots
                     sog = float(row[4])
-                    max_sog_kts = TrackParameters().max_sog_kts
+                    max_sog_kts = trk_params.max_sog_kts
                     if not ut.is_sog_valid(sog, max_sog_kts):
                         continue
                     # ensure cog is valid
@@ -74,8 +74,8 @@ def run_filter_invalid_data():
     print("Running Marine Cadastre Filter Invalid Function")
 
     # get filenames
-    # TODO use command line args for directory path
-    unfiltered_data = Path("/mnt/data/unzips")  # update for your system
+    config = Config()
+    unfiltered_data = config.upzips_data_dir
     filenames = ut.list_files_by_type(unfiltered_data, ".csv")
     if len(filenames) == 0:
         print(f"No CSV files found in {unfiltered_data}")
@@ -85,10 +85,10 @@ def run_filter_invalid_data():
         print(f"Found {len(filenames)} CSV files in {unfiltered_data}")
 
     # filter invalid data
-    filtered_data_dir = Path("/mnt/data/filtered")  # update for your system
+    filtered_data_dir = config.filtered_data_dir
     filtered_data_dir.mkdir(parents=True, exist_ok=True)
     raw_data_filepaths = [unfiltered_data/f for f in filenames]
-    filter_invalid_data(raw_data_filepaths, filtered_data_dir)
+    filter_invalid_data(raw_data_filepaths, filtered_data_dir, config.track_params)
 
 
 if __name__ == "__main__":
