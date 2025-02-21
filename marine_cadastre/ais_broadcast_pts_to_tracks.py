@@ -117,7 +117,7 @@ def calculate_track_stats(tracks: Dict[int, AISTrack]) -> pd.DataFrame:
     return pd.DataFrame(track_stats)
 
 
-def resample(track: AISTrack, interval=600):
+def resample(track: AISTrack, interval=600) -> np.ndarray:
     """
     Resample AIS broadcast data (default 600 seconds (10-minutes))
 
@@ -128,12 +128,9 @@ def resample(track: AISTrack, interval=600):
     Returns:
         Resample data
     """
-    x = np.arange(track.start_time, track.end_time, interval)
-    xp = track.timestamps
-    resampled_lats = np.interp(x, xp, track.lats)
-    resampled_lons = np.interp(x, xp, track.lons)
-    resampled_sogs = np.interp(x, xp, track.sogs)
-    resampled_cogs = np.interp(x, xp, track.cogs)
-    resample_tracks = np.array(
-        [x, resampled_lats, resampled_lons, resampled_sogs, resampled_cogs])
-    return resample_tracks
+    target_timestamps = np.arange(track.start_time, track.end_time, interval)
+    resamp_lats = np.interp(target_timestamps, track.timestamps, track.lats)
+    resamp_lons = np.interp(target_timestamps, track.timestamps, track.lons)
+    resamp_sogs = np.interp(target_timestamps, track.timestamps, track.sogs)
+    resamp_cogs = np.interp(target_timestamps, track.timestamps, track.cogs)
+    return (target_timestamps, resamp_lats, resamp_lons, resamp_sogs, resamp_cogs)
