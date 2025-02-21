@@ -40,7 +40,7 @@ def main():
     track_stats = track_stats[
         (track_stats["total_distance"] > config.track_params.min_dist_nmi) &
         (track_stats["duration_hours"] > config.track_params.min_duration_hrs) &
-        (track_stats["number_of_positions"] > config.track_params.min_points)]
+        (track_stats["number_of_positions"] > config.track_params.min_raw_points)]
 
     print("Track Summary:")
     print(track_stats.to_string())
@@ -49,8 +49,10 @@ def main():
     for _, row in track_stats.iterrows():
         mmsi = int(row['mmsi'])
         timestamps, lats, lons, sogs, cogs = pts2trks.resample(tracks[mmsi],
-                                                               interval=600)
+                                                               interval=config.track_params.resampled_time_sec)
         # trajectory data in the format used in TrAISformer publication
+        if timestamps.shape[0] < config.track_params.min_resampled_points:
+            continue
         entry = {}
         entry[mmsi] = mmsi
         traj = np.zeros((timestamps.shape[0], 6), dtype=np.float32)
@@ -73,12 +75,21 @@ def main():
     track_datapath = Path(config.track_data_dir / "traisformer_data.pkl")
     data = tdh.load_pkld_track_data(track_datapath, config.roi)
 
+    print(f"Loaded {len(data)} tracks")
+
+    shortest = 1000000
+    longest = -1000000
+
     plt.style.use("fivethirtyeight")
     fig, ax = plt.subplots(figsize=(10, 10))
     for entry in data:
+        pts = entry["traj"].shape[0]
+        shortest = min(shortest, pts)
+        longest = max(longest, pts)
         ax.scatter(entry["traj"][:, 1], entry["traj"][:, 0], s=10, alpha=0.5)
     ctx.add_basemap(ax, source=basemap_path, crs="epsg:4326")
     fig.savefig(config.results_dir/"track_plot.png")
+    print(f"shortest {shortest:,} and longest {longest:,}")
 
 
 if __name__ == "__main__":

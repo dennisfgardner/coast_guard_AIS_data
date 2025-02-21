@@ -10,8 +10,10 @@ class TrackParameters():
     """
     max_sog_kts: float = 40.0
     min_duration_hrs: float = 1.0
-    min_dist_nmi: float = 5.0
-    min_points: int = 10
+    min_dist_nmi: float = 20.0
+    min_raw_points: int = 100
+    resampled_time_sec: int = 600
+    min_resampled_points: int = 25
 
 
 # TODO RegionOfInterest should have setters which update the calculated values

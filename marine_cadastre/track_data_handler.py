@@ -22,8 +22,6 @@ def load_pkld_track_data(datapath: Path, roi: RegionOfInterest) -> List[Dict]:
     """
     with open(datapath, "rb") as f:
         data = pickle.load(f)
-    print(f"Loaded {len(data)} tracks")
-    print(type(data))
     for entry in data:
         traj = entry["traj"]
         traj[:, 0], traj[:, 1] = undo_norm_ll(roi, traj[:, 0], traj[:, 1])
