@@ -1,6 +1,7 @@
 "main entry point"
 
 import csv
+import pickle
 from typing import List, Dict
 from pathlib import Path
 from pprint import pprint
@@ -130,7 +131,7 @@ def main():
     # filtered_data_filepaths = [filtered_data_dir/f for f in filenames]
     # roi_filter(config.roi, filtered_data_filepaths, roi_data_dir)
 
-    csv_file = Path("./output/roi/AIS_2023_01_01.csv")
+    # csv_file = Path("./output/roi/AIS_2023_01_01.csv")
     # tk_cfg = cfg.TrackParameters()
 
     # tracks = pts2trks.broadcast_pts_to_tracks(csv_file)
@@ -145,28 +146,36 @@ def main():
     # print("Track Summary:")
     # print(track_stats.to_string())
 
-    # resampled_tracks: Dict[int, np.ndarray] = {}
+    # traisfromer_data = []
     # for _, row in track_stats.iterrows():
     #     mmsi = int(row['mmsi'])
-    #     resampled_tracks[mmsi] = pts2trks.resample(tracks[mmsi], interval=600)
-    # print(resampled_tracks)
-    # TODO format data in TrAISformer normalized format
-    # TODO normalized lat, lon, sog, cog
-    # TODO add mmsi and timestamp values to np.array
+    #     timestamps, lats, lons, sogs, cogs = pts2trks.resample(tracks[mmsi],
+    #                                                            interval=600)
+    #     # trajectory data in the format used in TrAISformer publication
+    #     entry = {}
+    #     entry[mmsi] = mmsi
+    #     traj = np.zeros((timestamps.shape[0], 6), dtype=np.float32)
+    #     traj[:, 0] = (lats - config.roi.lat_min)/(config.roi.lat_width)
+    #     traj[:, 1] = (lons - config.roi.lon_min)/(config.roi.lon_width)
+    #     traj[:, 2] = sogs/40.0
+    #     traj[:, 3] = cogs/360.0
+    #     traj[:, 4] = timestamps
+    #     traj[:, 5] = mmsi
+    #     entry["traj"] = traj
+    #     traisfromer_data.append(entry)
+    # with open(config.output_dir / "traisformer_data.pkl", "wb") as f:
+    #     pickle.dump(traisfromer_data, f)
 
 
     basemap_path = mc_plt.get_basemap(Path("./output"), config.roi)
-    track_datapath = Path("./data/ct_dma_train.pkl")
+    # track_datapath = Path("./data/ct_dma_train.pkl")
+    track_datapath = Path(config.output_dir / "traisformer_data.pkl")
     data = tdh.load_pkld_track_data(track_datapath, config.roi)
-    
+
     plt.style.use("fivethirtyeight")
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.scatter(data[0]["traj"][:, 1], data[0]["traj"][:, 0], s=10, c="blue", alpha=0.5)
-    ax.scatter(data[1]["traj"][:, 1], data[1]["traj"][:, 0], s=10, c="red", alpha=0.5)
-    ax.scatter(data[2]["traj"][:, 1], data[2]["traj"][:, 0], s=10, c="green", alpha=0.5)
-    ax.scatter(data[3]["traj"][:, 1], data[3]["traj"][:, 0], s=10, c="black", alpha=0.5)
-    ax.scatter(data[4]["traj"][:, 1], data[4]["traj"][:, 0], s=10, c="orange", alpha=0.5)
-    ax.scatter(data[5]["traj"][:, 1], data[5]["traj"][:, 0], s=10, c="purple", alpha=0.5)
+    for entry in data:
+        ax.scatter(entry["traj"][:, 1], entry["traj"][:, 0], s=10, alpha=0.5)
     ctx.add_basemap(ax, source=basemap_path, crs="epsg:4326")
     plt.show()
 

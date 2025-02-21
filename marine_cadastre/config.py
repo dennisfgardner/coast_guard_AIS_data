@@ -14,45 +14,45 @@ class TrackParameters():
 
 
 # TODO RegionOfInterest should have setters which update the calculated values
-# @dataclass(frozen=True)
-# class RegionOfInterest():
-#     """define ROI in lat & long degrees
-
-#     default values center around Chesapeake Bay near Washington D.C.
-#     with height and width similar to the TrAISformer publication
-#     """
-
-#     # latitude
-#     lat_cen: float = 38.0
-#     lat_width: float = 2.5
-#     # longitude
-#     lon_cen: float = -76.0
-#     lon_width: float = 2.7
-#     # calculate extent of ROI
-#     lat_min: float = lat_cen - lat_width / 2
-#     lat_max: float = lat_cen + lat_width / 2
-#     lon_min: float = lon_cen - lon_width / 2
-#     lon_max: float = lon_cen + lon_width / 2
-
-
 @dataclass(frozen=True)
 class RegionOfInterest():
     """define ROI in lat & long degrees
 
-    default values from TrAISformer publication
+    default values center around Chesapeake Bay near Washington D.C.
+    with height and width similar to the TrAISformer publication
     """
 
     # latitude
-    lat_cen: float = 56.75
+    lat_cen: float = 38.0
     lat_width: float = 2.5
     # longitude
-    lon_cen: float = 11.65
+    lon_cen: float = -76.0
     lon_width: float = 2.7
     # calculate extent of ROI
     lat_min: float = lat_cen - lat_width / 2
     lat_max: float = lat_cen + lat_width / 2
     lon_min: float = lon_cen - lon_width / 2
     lon_max: float = lon_cen + lon_width / 2
+
+
+# @dataclass(frozen=True)
+# class RegionOfInterest():
+#     """define ROI in lat & long degrees
+
+#     default values from TrAISformer publication
+#     """
+
+#     # latitude
+#     lat_cen: float = 56.75
+#     lat_width: float = 2.5
+#     # longitude
+#     lon_cen: float = 11.65
+#     lon_width: float = 2.7
+#     # calculate extent of ROI
+#     lat_min: float = lat_cen - lat_width / 2
+#     lat_max: float = lat_cen + lat_width / 2
+#     lon_min: float = lon_cen - lon_width / 2
+#     lon_max: float = lon_cen + lon_width / 2
 
 
 @dataclass()
