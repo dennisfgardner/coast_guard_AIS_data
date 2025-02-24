@@ -32,3 +32,9 @@ The same ROI size is the default in configs.py.
 However, unlike the TrAISformer, the default ROI is centered around Washington, DC / Chesapeake Bay.
 Run `python ./select_roi_data.py` to select only the data within the ROI.
 About 4-7% of the data is within the default Washington DC / Chesapeake Bay ROI.
+
+### Create Tracks
+
+Create vessel tracks from the broadcast messages.
+Run `./create_tracks.py`.
+Optionally, you can plot the tracks with `./plot_tracks.py`.
