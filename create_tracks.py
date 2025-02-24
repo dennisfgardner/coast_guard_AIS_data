@@ -58,7 +58,7 @@ def run_create_tracks():
             if timestamps.shape[0] < config.track_params.min_resampled_points:
                 continue
             entry = {}
-            entry[mmsi] = mmsi
+            entry["mmsi"] = mmsi
             traj = np.zeros((timestamps.shape[0], 6), dtype=np.float32)
             traj[:, 0] = (lats - config.roi.lat_min)/(config.roi.lat_width)
             traj[:, 1] = (lons - config.roi.lon_min)/(config.roi.lon_width)

@@ -58,6 +58,14 @@ class RegionOfInterest():
 #     lon_max: float = lon_cen + lon_width / 2
 
 
+@dataclass(frozen=True)
+class Splits():
+    train: float = 0.775
+    valid: float = 0.108
+    test: float = 0.116
+    total: float = train + valid + test
+
+
 @dataclass()
 class Config:
     zips_data_dir: Path = Path("/mnt/data/zips")
@@ -65,9 +73,10 @@ class Config:
     filtered_data_dir: Path = Path("/mnt/data/filtered")
     rois_data_dir: Path = Path("/mnt/data/rois")
     track_data_dir: Path = Path("/mnt/data/tracks")
-    results_dir: Path = Path("./output")
+    results_dir: Path = Path("./output/mc_ais")
     roi: RegionOfInterest = RegionOfInterest()
     track_params: TrackParameters = TrackParameters()
+    splits: Splits = Splits()
 
 
 if __name__ == "__main__":

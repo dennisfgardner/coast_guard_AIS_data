@@ -4,13 +4,17 @@ import pickle
 from pathlib import Path
 from pprint import pprint
 
+import numpy as np
+
 
 # path to TrAISformer data
-traisformer_data_dir = Path("/home/ubuntu/TrAISformer/data/ct_dma/")
+traisformer_data_dir = Path("./output/mc_ais/")
+# traisformer_data_dir = Path("../TrAISformer/data/ct_dma/")
 datasets = ["train", "valid", "test"]
 datapaths = []
 for name in datasets:
-    datapaths.append(traisformer_data_dir/f"ct_dma_{name}.pkl")
+    datapaths.append(traisformer_data_dir/f"mc_ais_{name}.pkl")
+    # datapaths.append(traisformer_data_dir/f"ct_dma_{name}.pkl")
 pprint(datapaths)
 
 track_nums = []
@@ -24,6 +28,14 @@ for name, file in zip(datasets, datapaths):
     track_nums.append(len(data))
     for track in data:
         track_data = track["traj"]
+        # lats = track_data[:, 0]
+        # print(f"lats min {np.min(lats):.2f} max {np.max(lats):.2f}")
+        # lons = track_data[:, 1]
+        # print(f"lons min {np.min(lons):.2f} max {np.max(lons):.2f}")
+        # sogs = track_data[:, 2]
+        # print(f"sogs min {np.min(sogs):.2f} max {np.max(sogs):.2f}")
+        # cogs = track_data[:, 3]
+        # print(f"cogs min {np.min(cogs):.2f} max {np.max(cogs):.2f}")
         track_pts = track_data.shape[0]
         longest_track = max(longest_track, track_pts)
         shortest_track = min(shortest_track, track_pts)
